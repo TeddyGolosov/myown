@@ -1,0 +1,23 @@
+def searching():
+    import re
+    import urllib.request
+    req = urllib.request.Request('http://magazines.russ.ru/volga/')
+    with urllib.request.urlopen(req) as response:
+       html = response.read().decode('utf-8')
+    regex = '<li(?: class="dropdown-header">(.*?)|><a href="/[a-z]+?/">(.*?)</a>)</li>'
+    a = re.findall(regex, html)
+    return a
+def making(x):
+    fw = open('D:/zagolovki1.txt', 'a', encoding = 'utf-8')
+    for zag in x:
+        if zag[0] == '':
+            fw.write((zag[1]) + '\n')
+        else:
+            fw.write((zag[0]) + '\n')
+    return x
+    fw.close()
+def main():
+    c = making(searching())
+    return
+if __name__ == '__main__':
+    main()
