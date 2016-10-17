@@ -1,0 +1,309 @@
+import urllib.request
+import time
+import re
+import os
+def download_page(pageUrl): #эта функция загружает страницу номера журнала, считывает с неё текст для поиска статей
+    try:
+        page = urllib.request.urlopen(pageUrl)
+        
+        text = page.read().decode('utf-8')
+        find_states(text, pageUrl)
+       
+        
+    except:
+        print('Error at', pageUrl)
+        return
+   
+def find_states(text, pageUrl): #эта функция отвечает за поиск статей на уровне странички номера журнала и является узлом для развития функций обработки текстов
+    a = re.findall('volga.+?.html', text)
+    
+    for state in a:
+        page = urllib.request.urlopen('http://magazines.russ.ru/' + state)
+        
+        text = page.read().decode('utf-8')
+        
+        
+        time, h, auth = tablemaking(text, state, pageUrl)
+        text = fresh_text(text, state, time, h, auth)
+        
+        make_directory_plain(text, state)
+        
+        
+    return
+def mystem_plain(directory):
+   
+    inp = 'D:' + os.sep + directory
+    outp = re.sub('plain', 'mystem-plain', inp)
+    if not os.path.exists(outp):
+        os.makedirs(outp)
+    lst = os.listdir(inp)
+    for fl in lst:
+        os.system(r"D:\mystem.exe " + ' -id ' +inp + os.sep + fl + ' ' + outp + os.sep + fl )
+        f = open(outp + os.sep + fl, 'r', encoding = 'utf-8')
+        string = f.read()
+        f.close()
+        string = re.sub('au.*{html\?\?}', '', string)
+        fw = open(outp + os.sep + fl, 'w', encoding = 'utf-8')
+        fw.write(string)
+        fw.close()
+       
+    return
+def mystem_xml(directory):
+    inp = 'D:' + os.sep + directory
+    outp = re.sub('plain', 'mystem-xml', inp)
+    
+    if not os.path.exists(outp):
+        
+        os.makedirs(outp)
+    
+    lst = os.listdir(inp)
+    
+    for fl in lst:
+        os.system(r"D:\mystem.exe " + ' -id ' + '--format xml ' + inp + os.sep + fl + ' ' + outp + os.sep + fl )
+        f = open(outp + os.sep + fl, 'r', encoding = 'utf-8')
+        string = f.read()
+        f.close()
+        string = re.sub('au.*{html\?\?}', '', string)
+        fw = open(outp + os.sep + fl, 'w', encoding = 'utf-8')
+        fw.write(string)
+        fw.close()
+    return
+def make_directory_plain(text, state): #эта функция отвечает за создания папок группы plain, то есть необработанных текстов
+    state = state.replace('/', os.sep)
+    state = re.sub('html', 'txt', state)
+    w = state.find(os.sep)
+    state = 'volga' + os.sep + 'plain' + state[w:]
+    
+    v = state.rfind(os.sep)
+    
+    directory = state[:v]
+    if not os.path.exists('D:' + os.sep + directory):
+         os.makedirs('D:' + os.sep + directory)
+    fw = open('D:' + os.sep + state, 'a', encoding = 'utf-8')
+    
+    
+    fw.write(text)
+    fw.close()
+    mystem_plain(directory)
+    
+    mystem_xml(directory)
+    return
+
+    
+def fresh_text(text, state, time, h, auth): #эта функция, насколько может, старается очистить текст от оформительного мусора
+    
+    text = re.sub('(?:[A-Za-z<>\/-_"$\*\(\)]|\')(?:\t|\n)?', '', text)
+    
+    text = '@url ' + state + '\n' + text
+    text = '@topic \n' + text
+    text = '@da ' + time + '\n'+ text
+    
+    text = '@ti' + h + '\n'+ text
+    text = '@au ' + auth + '\n' + text
+    
+    
+    return text
+
+def tablemaking(text, state, pageUrl): #эта функция собирает метаданные конкретной статьи в табличку, состоит из подфункций для каждой строчки метаданных
+
+    
+    
+    path(text, state)
+  
+    
+    auth = author(text)
+    
+    empty_f()
+    empty_f()
+    h = header(text)
+    
+    time = created(text)
+    
+    sphere()
+    empty_f()
+    empty_f()
+    empty_f()
+    empty_f()
+   
+    style()
+    audience_age()
+    audience_level()
+    audience_size()
+    source(pageUrl)
+    publication()
+    empty_f()
+    medium()
+    country()
+    region()
+    language()
+    
+    
+    return time, h, auth
+def path(text, state):
+    fw =  open('D:/volga/metadata.csv', 'a', encoding = 'utf-8')
+    fw.write('\n' + 'D:/volga/plain/'+ tate)
+    fw.close()
+    return
+def author(text):
+    a = re.findall('author" content="(.+?)"', text)
+    fw = open('D:/volga/metadata.csv', 'a', encoding = 'utf-8')
+    if a != []:
+        fw.write('\t' + a[0] )
+        fw.close()
+    else:
+        a = a.append('Noname')
+        fw.write('\t')
+        fw.close()
+    return a[0]
+def empty_f():
+    fw = open('D:/volga/metadata.csv', 'a', encoding = 'utf-8')
+    fw.write('\t' + '\n')
+    fw.close()
+    
+    return
+def header(text):
+    a=[]
+    a = re.findall('<title>Журнальный зал \|(.+?)</title>' , text)
+    
+    fw = open('D:/volga/metadata.csv', 'a', encoding = 'utf-8')
+    if a != []:
+        fw.write('\t' + a[0] )
+        fw.close()
+    else:
+        a.append(' ')
+        fw.write('\t')
+        fw.close()
+    return a[0]
+def created(text):
+    b=[]
+    b = re.findall('Created>(.+?)T*', text)
+    
+    
+    
+    fw = open('D:/volga/metadata.csv', 'a', encoding = 'utf-8')
+    if b != []:
+        b[0] = re.sub('-', '\.', b[0])
+        fw.write('\t' + b[0])
+        fw.close()
+    else:
+        b.append(' ')
+        fw.write('\t')
+        fw.close()
+    
+    return b[0]
+def sphere():
+    fw = open('D:/volga/metadata.csv', 'a', encoding = 'utf-8')
+    fw.write('\t' + 'публицистика')
+    fw.close()
+    return
+def style():
+    fw = open('D:/volga/metadata.csv', 'a', encoding = 'utf-8')
+    fw.write('\t' + 'нейтральный')
+    fw.close()
+    return
+def audience_age():
+    fw = open('D:/volga/metadata.csv', 'a', encoding = 'utf-8')
+    fw.write('\t' + 'н-возраст')
+    fw.close()
+    return
+def audience_level():
+    fw = open('D:/volga/metadata.csv', 'a', encoding = 'utf-8')
+    fw.write('\t' + 'н-уровень')
+    fw.close()
+    return
+def audience_size():
+    fw = open('D:/volga/metadata.csv', 'a', encoding = 'utf-8')
+    fw.write('\t' + 'районная')
+    fw.close()
+    return
+def source(pageUrl):
+    fw = open('D:/volga/metadata.csv', 'a', encoding = 'utf-8')
+    fw.write('\t' + pageUrl)
+    fw.close()
+    return
+def publication():
+    fw = open('D:/volga/metadata.csv', 'a', encoding = 'utf-8')
+    fw.write('\t' + 'Волга')
+    fw.close()
+    return
+def medium():
+    fw = open('D:/volga/metadata.csv', 'a', encoding = 'utf-8')
+    fw.write('\t' + 'газета')
+    fw.close()
+    return
+def country():
+    fw = open('D:/volga/metadata.csv', 'a', encoding = 'utf-8')
+    fw.write('\t' + 'Россия')
+    fw.close()
+    return
+def region():
+    fw = open('D:/volga/metadata.csv', 'a', encoding = 'utf-8')
+    fw.write('\t' + 'Саратовская область')
+    fw.close()
+    return
+def language():
+    fw = open('D:/volga/metadata.csv', 'a', encoding = 'utf-8')
+    fw.write('\t' + 'ru' + '\n')
+    fw.close()
+    print('ll')
+    return
+commonUrl = 'http://magazines.russ.ru/volga/'
+
+
+def metadata():
+
+    os.makedirs('D:/volga')
+    
+    fw = open('D:/volga/metadata.csv', 'a', encoding = 'utf-8')
+    fw.write('path')
+    fw.write('\t' + ' author')
+    fw.write('\t' + ' sex')
+    fw.write('\t' + 'birthday')
+    fw.write('\t' + 'header')
+    fw.write('\t' + 'created')
+    fw.write('\t' + 'sphere')
+    fw.write('\t' + 'genre_fi')
+    fw.write('\t' + 'type')
+    fw.write('\t' + 'topic')
+    fw.write('\t' + 'chronotop')
+    fw.write('\t' + 'style')
+    fw.write('\t' + 'audience_age')
+    fw.write('\t' + 'audience_level')
+    fw.write('\t' + 'audience_size')
+    fw.write('\t' + 'source')
+    fw.write('\t' + 'publication')
+    fw.write('\t' + 'publisher')
+    fw.write('\t' + 'publ_year')
+    fw.write('\t' + 'medium')
+    fw.write('\t' + 'country')
+    fw.write('\t' + 'region')
+    fw.write('\t' + 'language')
+    fw.close()
+    return
+metadata()
+
+
+for i in range(1998, 2001):
+    yearUrl = commonUrl + str(i)
+    for j in range(1, 13):
+        pageUrl = yearUrl +'/' + str(j)
+        time.sleep(2)
+        download_page(pageUrl)
+        
+    for k in range(1, 12):
+        pageUrl = yearUrl + '/' + str(k) + '-' + str(k+1)
+        download_page(pageUrl)
+        time.sleep(2)
+for i in range(2008, 2017):
+    yearUrl = commonUrl + str(i)
+    for j in range(1, 13):
+        pageUrl = yearUrl +'/' + str(j)
+        time.sleep(2)
+        download_page(pageUrl)
+        
+    for k in range(1, 12):
+        pageUrl = yearUrl + '/' + str(k) + '-' + str(k+1)
+        download_page(pageUrl)
+        time.sleep(2)
+
+download_page(pageUrl)
