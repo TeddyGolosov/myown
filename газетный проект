@@ -141,7 +141,7 @@ def tablemaking(text, state, pageUrl): #эта функция собирает �
     return time, h, auth
 def path(text, state):
     fw =  open('D:/volga/metadata.csv', 'a', encoding = 'utf-8')
-    fw.write('\n' + 'D:/volga/plain/'+ tate)
+    fw.write('\n' + 'D:/volga/plain/'+ state)
     fw.close()
     return
 def author(text):
