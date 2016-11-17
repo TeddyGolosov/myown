@@ -1,0 +1,55 @@
+<html>
+<head> 
+<title>Деление_на_части</title>
+</head>
+<body>
+<style> h1{color: blue; font-size: 50px; font-family: Cambria}
+        p{font-size: 30px; font-style: italic}
+		p1{font-size: 20px}
+        		</style>
+<h1> Деление на части: онлайн-тест</h1><br>
+
+<p> Спасибо большое за готовность помочь науке!
+ Перед Вами представлены гифки, изображающие определённое действие. Пожалуйста, придумайте, каким глаголом можно описать это действие, и запишите инфинитив этого глагола. </p>
+
+ <form  action="/complete/" action="/statistics" method="GET">
+     <p1>Введите Ваши инициалы (полные ФИО): <input type="text" name="ФИО" value=""><br><br>
+	 Какие языки Вы знаете? <input type="text" name="языки" value=""><br><br>
+	 Сколько Вам лет?<Br><br>
+	 <input type="radio" name="answer" value="0 - 17">меньше 18<Br>
+     <input type="radio" name="answer" value="18 - 25">18 - 25<Br>
+     <input type="radio" name="answer" value="26 - 40">26 - 40<Br>
+     <input type="radio" name="answer" value="41 - 60">41 - 60<Br>
+	 <input type="radio" name="answer" value="60+">больше 60<Br><Br>
+    
+     Опишите действие инфинитивом: <input type="text" name="ans1" value=""><br>
+	 <img style="margin:25px" src="{{url_for('static', filename='shink.gif')}}" /><br>
+     Опишите действие инфинитивом : <input type="text" name="ans2" value=""><br>
+     <img style="margin:25px" src="{{url_for('static', filename='lomat.gif')}}" /><br>   
+	 Опишите действие инфинитивом: <input type="text" name="ans3" value=""><br>
+     <img style="margin:25px" src="{{url_for('static', filename='razbint.gif')}}" /><br>  
+	 
+     Опишите действие инфинитивом : <input type="text" name="ans4" value=""><br>
+	 <img style="margin:25px" src="{{url_for('static', filename='rezat.gif')}}" /><br>  
+	 Опишите действие инфинитивом : <input type="text" name="ans5" value=""><br>
+	 <img style="margin:25px" src="{{url_for('static', filename='otrezat.gif')}}" /> <br>  
+	 
+	 Опишите действие инфинитивом : <input type="text" name="ans6" value=""><br>
+	 <img style="margin:25px" src="{{url_for('static', filename='razbit.gif')}}" /><br>  
+	 Опишите действие инфинитивом : <input type="text" name="ans7" value=""><br>
+	 <img style="margin:15px" src="{{url_for('static', filename='lopat.gif')}}" /><br>  </p1> 
+	 
+	 <input type="submit" value="Все поля заполнены, отсылаю заполненный тест!">
+</form>
+<br>
+<form action="/search/" method="GET">
+     <input type="submit" value="Поиск слова в готовых анкетах"> <br>
+</form>
+<form action="/stats/" method="GET">
+     <input type="submit" value="Статистика">
+</form>
+<form action="/json/" method="GET">
+     <input type="submit" value="Данные в json">
+</form>
+</body>
+</html>
