@@ -1,0 +1,76 @@
+import re
+import json
+from flask import Flask
+from flask import render_template, redirect, url_for, request
+from urllib.parse import unquote 
+
+app = Flask(__name__)
+@app.route('/')
+def index():
+    return render_template('index.html')
+@app.route('/complete/')
+def results():
+    
+    fw = open('results.txt', 'a', encoding = 'utf-8')
+    fw.write('ФИО: ' + request.args['ФИО'] + '\n' + 'Языки: ' + request.args['языки'] + '\n' + 'Возраст: ' + request.args['answer'] + '\n')
+    for i in range(1, 8):
+        fw.write( 'GIF ' + str(i) + ': ' + request.args['ans'+ str(i)] + '\n')
+    fw.close()
+    return render_template('complete.html')
+@app.route('/stats/')
+def stats():
+    f = open('results.txt', 'r', encoding = 'utf-8')
+    string = f.read()
+    f.close()
+    names = re.findall ('ФИО:(.+?)\n', string)
+    nl = len(names)
+    names = '\n'.join(names)
+    GIF1 = re.findall('GIF 1:(.+?)\n', string)
+    gif1 = ' '.join(GIF1)
+    GIF2 = re.findall('GIF 2:(.+?)\n', string)
+    gif2 = ' '.join(GIF2)
+    GIF3 = re.findall('GIF 3:(.+?)\n', string)
+    gif3 = ' '.join(GIF3)
+    GIF4 = re.findall('GIF 4:(.+?)\n', string)
+    gif4 = ' '.join(GIF1)
+    GIF5 = re.findall('GIF 5:(.+?)\n', string)
+    gif5 = ' '.join(GIF1)       
+    GIF6 = re.findall('GIF 6:(.+?)\n', string)
+    gif6 = ' '.join(GIF1)
+    GIF7 = re.findall('GIF 7:(.+?)\n', string)
+    gif7 = ' '.join(GIF1)
+    
+
+    
+    return '<p> Количество принявших участие:' + str(nl) + '<Br>' + 'Имена участников: ' +  names + ' <Br>' + 'Далее - списки глаголов, которыми описывались картинки <Br>'+  gif1 + '<Br>'+ gif2 + '<Br>' + gif3 + '<Br>' + gif4 + '<Br>' + gif5 + '<Br>' + gif6 + '<Br>' + gif7 + '<Br>'  
+@app.route('/search/')
+def search():
+   return render_template('search.html')
+@app.route('/result/')
+def result():
+    f = open('results.txt', 'r', encoding = 'utf-8')
+    string = f.read()
+    f.close()
+    if request.args:
+        sear = request.args['поиск']
+        t = re.findall(sear, string)
+        numb = len(t)
+    
+        return '<p> Найдено следующее число вхождений: ' + str(numb) +  '</p>'
+    else:
+        return '<p> Нет вхождений. </p>'
+        
+    
+    
+@app.route('/json/')  
+def jso():
+    f = open('results.txt', 'r', encoding = 'utf-8')
+    arr = f.read().split('/n')
+    f.close()
+    li = json.dumps(arr)
+    return li 
+
+    
+    
+if __name__ == '__main__':
+    app.run(debug = True)
