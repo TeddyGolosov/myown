@@ -1,0 +1,90 @@
+import urllib.request, re, html
+def news_reading(i):
+    news = ['https://regnum.ru/news/innovatio/2211264.html','http://www.mk.ru/science/2016/11/29/tainstvennyy-labirint-na-marse-privlek-vnimanie-planetologov.html', 'https://rg.ru/2016/11/29/na-marse-obnaruzhen-labirint.html', 'http://www.rosbalt.ru/style/2016/11/29/1571387.html']
+
+
+    page = urllib.request.urlopen(news[i])
+    text = page.read().decode('utf-8')
+    regTag = re.compile('<.*?>', flags=re.U | re.DOTALL) 
+    regScript = re.compile('<script>.*?</script>', flags=re.U | re.DOTALL) 
+    regComment = re.compile('<!--.*?-->', flags=re.U | re.DOTALL)  
+
+    text = regScript.sub("", text)
+    text = regComment.sub("", text)
+    text = regTag.sub("", text)
+    text = html.unescape(text)
+    text = ' '.join(re.findall('На равнине(?:.\n)*?породы|На(?:.|\n)*?лабиринта»|Исследователи(?:.|\n)*?20 километров|Европейское(?:.|\n)*планеты|Adamas(?:.|\n)*оазисы', text))
+    
+    
+        
+    
+        
+    return text
+def making(text):
+    text = text.split()
+    for i in range(len(text)):
+        text[i] = text[i].strip(' .,?/:;!"\()[]{}«»').lower()
+    m = set(text)
+    
+    return m
+def special_making(text):
+    m = set()
+    d = {}
+    text = text.split()
+    for i in range(len(text)):
+        text[i] = text[i].strip(' .,?/:;!"\()[]{}«»').lower()
+        if text[i] in d:
+            d[text[i]] += 1
+        else:
+            d[text[i]] = 1
+    for word in d:
+        if d[word] > 1:
+            m.add(word)
+    
+    
+    return m
+def task1():
+    M = making(news_reading(0))
+   
+    for i in range(1, 4):
+        
+        M &= making(news_reading(i))
+        
+    M = list(M)
+    M.sort()
+    
+    fw = open('task1.txt', 'a', encoding = 'utf-8')
+    for word in M:
+        fw.write(word + '\n')
+    fw.close()
+def task2():
+    M = making(news_reading(0))
+    for i in range(1, 4):
+        M ^= making(news_reading(i))
+    M = list(M)
+    M.sort()
+    
+    fw = open('task2.txt', 'a', encoding = 'utf-8')
+    for word in M:
+        fw.write(word + '\n')
+    fw.close()
+    
+def task3():
+    M = special_making(news_reading(0))
+    for i in range(1, 4):
+       
+        M ^= special_making(news_reading(i))
+    M = list(M)
+    M.sort()
+    
+    fw = open('task3.txt', 'a', encoding = 'utf-8')
+    for word in M:
+        fw.write(word + '\n')
+    fw.close()
+    
+def main():
+    a = task1()
+    b = task2()
+    c = task3()
+if __name__ == '__main__':
+    main()
