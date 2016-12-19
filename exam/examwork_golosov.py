@@ -39,7 +39,7 @@ def task2():
 def task3(n):
     q = set()
     
-    fw = open('D:/sql1.txt', 'w', encoding = 'utf-8')
+    fw = open('D:/sql.txt', 'w', encoding = 'utf-8')
     for word in n:
         regex = '(\w+?){(\w+?)=S'
         a = re.findall(regex, word)
